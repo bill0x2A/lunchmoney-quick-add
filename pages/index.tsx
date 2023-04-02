@@ -1,6 +1,8 @@
 import Head from 'next/head';
+import Image from 'next/image';
 import React, { createRef, useEffect, useReducer, useState } from 'react';
 import dayjs from 'dayjs';
+import getSymbolFromCurrency from 'currency-symbol-map'
 import styled from 'styled-components';
 
 const MoneyAdder = styled.div`
@@ -42,7 +44,7 @@ const CategoryHeaderGroup = styled.div`
 const DisplayButton = styled.button`
     padding: 5px 30px;
     margin: 0;
-    box-shadow: 3px 3px 0 rgba(74, 225, 94, 1);
+    box-shadow: 3px 3px 0 rgb(221,115,41);
     color: #000;
     background-color: #fff;
     border: 1px solid #404040;
@@ -78,7 +80,7 @@ const CategorySelector = styled.div<CategoryI>`
     font-size: 12px;
     cursor: pointer;
     background-color: ${(props: CategoryI) =>
-        props.selected ? 'rgba(74, 225, 94, 1.00)' : 'rgba(255, 205, 1, .20)'};
+        props.selected ? 'rgb(221,115,41)' : 'rgba(255, 205, 1, .20)'};
     border-radius: 8px;
     color: ${(props: CategoryI) => (props.dimmed ? '#909090' : '#202020')};
 `;
@@ -143,7 +145,7 @@ const Button = styled.button`
     color: #fff;
     padding: 10px 30px;
     margin: 20px auto;
-    box-shadow: 3px 3px 0 rgba(74, 225, 94, 1);
+    box-shadow: 3px 3px 0 rgb(221,115,41);
     border: none;
     border-radius: 10px;
     font-size: 20px;
@@ -153,7 +155,7 @@ const Button = styled.button`
 `;
 
 const TinyField = styled.input`
-    box-shadow: 3px 3px 0 rgba(74, 225, 94, 1);
+    box-shadow: 3px 3px 0 rgb(221,115,41);
     border: 4px solid #404040;
     padding: 5px 10px;
     margin: auto 10px;
@@ -169,7 +171,7 @@ const TinyButton = styled.button`
     color: #fff;
     padding: 5px 10px;
     margin: auto 10px;
-    box-shadow: 3px 3px 0 rgba(74, 225, 94, 1);
+    box-shadow: 3px 3px 0 rgb(221,115,41);
     border: 3px solid #404040;
     border-radius: 10px;
     display: inline-block;
@@ -257,6 +259,8 @@ const Home: React.FC = () => {
     const [accessTokenInState, setAccessToken] = useState<string>('');
     const [success, setSuccess] = useState<boolean>(false);
     const [cats, setCats] = useState<Array<LunchMoneyCategory> | null>(null);
+    const [currencies, setCurrencies] = useState<string[]>(['thb', 'gbp', 'usd', 'vnd']);
+    const [chosenCurrency, setChosenCurrency] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [category, setChosenCategory] = useState<LunchMoneyCategory | null>(
         null
@@ -368,6 +372,7 @@ const Home: React.FC = () => {
                             category_id: category.id,
                             date: now.format('YYYY-MM-DD').toString(),
                             payee: 'CASH',
+                            currency: chosenCurrency,
                         },
                     ],
                 }),
@@ -390,15 +395,16 @@ const Home: React.FC = () => {
     return (
         <AppContainer>
             <Head>
-                <title>Milk Money</title>
+                <title>Ducky Dollars</title>
             </Head>
-
             <MainContainer>
                 <HeaderContainer>
                     <span>&nbsp;</span>
-                    <h1>Milk Money</h1>
+                    <h1>Ducky Dollars</h1>
                     <Gear onClick={() => showSettings(!settings)}>⚙️</Gear>
                 </HeaderContainer>
+
+                <Image src="/duck.png" alt="ducky" width={180} height={200} />
 
                 {(!authenticated || settings) && (
                     <div style={{ width: '100%', margin: '20px 0' }}>
@@ -446,7 +452,7 @@ const Home: React.FC = () => {
                             <TheSingleStepper>
                                 <ValueChange
                                     onClick={() => setNegative(false)}
-                                    selectedColor={!negative && '#8ff7b8'}
+                                    selectedColor={!negative && 'rgb(221,115,41)'}
                                 >
                                     +
                                 </ValueChange>
@@ -459,7 +465,7 @@ const Home: React.FC = () => {
                                     -
                                 </ValueChange>
                             </TheSingleStepper>
-                            <DollarSign>$</DollarSign>
+                            <DollarSign>{getSymbolFromCurrency(chosenCurrency?.toUpperCase())}</DollarSign>
                             <NumberInput
                                 id='lineItem'
                                 ref={amountRef}
@@ -471,28 +477,29 @@ const Home: React.FC = () => {
                                 }
                             />
                         </InputWrapper>
-                        <h3>Quick buttons:</h3>
-                        <MoneyAdder>
-                            <button onClick={() => setAmount(0)}>Clear</button>
-                            <button onClick={() => setAmount(amount + 1)}>
-                                $1
-                            </button>
-                            <button onClick={() => setAmount(amount + 2)}>
-                                $2
-                            </button>
-                            <button onClick={() => setAmount(amount + 5)}>
-                                $5
-                            </button>
-                            <button onClick={() => setAmount(amount + 10)}>
-                                $10
-                            </button>
-                            <button onClick={() => setAmount(amount + 20)}>
-                                $20
-                            </button>
-                            <button onClick={() => setAmount(amount + 100)}>
-                                $100
-                            </button>
-                        </MoneyAdder>
+                        {currencies?.length > 0 && (
+                            <FavoriteCategoriesHolder>
+                                <h3>Currencies:</h3>
+                                <CategoryHolder>
+                                    {currencies.map((currency) => {
+                                        return (
+                                            <CategorySelector
+                                                style={{ textTransform : 'uppercase' }}
+                                                selected={
+                                                    currency === chosenCurrency
+                                                }
+                                                key={currency}
+                                                onClick={() =>
+                                                    setChosenCurrency(currency)
+                                                }
+                                            >
+                                                {currency}
+                                            </CategorySelector>
+                                        );
+                                    })}
+                                </CategoryHolder>
+                            </FavoriteCategoriesHolder>
+                        )}
                         {success && (
                             <SuccessHolder>
                                 <p>
@@ -517,14 +524,14 @@ const Home: React.FC = () => {
                             </SuccessHolder>
                         )}
                         <CategoryHeaderGroup>
-                            <h3>Categories</h3>
-                            <DisplayButton
+                            <h3>Category</h3>
+                            {/* <DisplayButton
                                 onClick={() => setShowFavs(!showFavs)}
                             >
                                 {showFavs
                                     ? 'Show All Categories'
                                     : 'Hide Categories'}
-                            </DisplayButton>
+                            </DisplayButton> */}
                         </CategoryHeaderGroup>
                         {favCats.categories.length > 0 && showFavs && (
                             <FavoriteCategoriesHolder>
@@ -583,22 +590,7 @@ const Home: React.FC = () => {
             </MainContainer>
 
             <Footer>
-                <a
-                    href='https://fun-club.xyz'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                >
-                    a fun club project
-                </a>
-                <p>
-                    A really basic app that sends a cash transaction (probably)
-                    to{' '}
-                    <a href='https://lunchmoney.app/?refer=eg3r4y7t'>
-                        Lunch Money
-                    </a>
-                    . It’s all stored right on your phone once you add your api
-                    key, and it “just works.”
-                </p>
+                duck duck dollar
             </Footer>
         </AppContainer>
     );

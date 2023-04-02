@@ -7,6 +7,7 @@ export interface AddI {
     category: string;
     date: string;
     payee: string;
+    currency: string;
 }
 
 export default function add(req: NextApiRequest, res: NextApiResponse) {
