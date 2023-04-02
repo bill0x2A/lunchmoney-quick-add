@@ -143,7 +143,7 @@ const Button = styled.button`
     width: 100%;
     background-color: #404040;
     color: #fff;
-    padding: 10px 30px;
+    padding: 20px 30px;
     margin: 20px auto;
     box-shadow: 3px 3px 0 rgb(221,115,41);
     border: none;
@@ -152,6 +152,7 @@ const Button = styled.button`
     text-transform: uppercase;
     font-weight: 700;
     font-style: italic;
+    cursor: pointer;
 `;
 
 const TinyField = styled.input`
@@ -193,6 +194,21 @@ const NumberInput = styled.input`
     }
 `;
 
+const TextInput = styled.input`
+    font-size: 20px;
+    border: none;
+    width: 100%;
+    margin: 10px 0;
+    display: inline-block;
+    border: 1px solid #404040;
+    padding: 5px 10px;
+    border-radius: 4px;
+
+    &:focus {
+        outline: none;
+    }
+`;
+
 const DollarSign = styled.span`
     font-size: 22px;
 `;
@@ -200,6 +216,8 @@ const DollarSign = styled.span`
 const SuccessHolder = styled.div`
     display: flex;
     flex-direction: row;
+    color: green;
+    justify-content: center;
 `;
 
 const Footer = styled.div`
@@ -253,20 +271,21 @@ interface LunchMoneyCategory {
 
 const Home: React.FC = () => {
     const [authenticated, setAuthenticated] = useState<boolean>(false);
-    const [amount, setAmount] = useState<number>(0);
+    const [amount, setAmount] = useState<number>();
     const [loading, setLoading] = useState<boolean>(false);
     const [showFavs, setShowFavs] = useState<boolean>(false);
     const [accessTokenInState, setAccessToken] = useState<string>('');
     const [success, setSuccess] = useState<boolean>(false);
     const [cats, setCats] = useState<Array<LunchMoneyCategory> | null>(null);
     const [currencies, setCurrencies] = useState<string[]>(['thb', 'gbp', 'usd', 'vnd']);
-    const [chosenCurrency, setChosenCurrency] = useState<string>('');
+    const [chosenCurrency, setChosenCurrency] = useState<string>('vnd');
     const [error, setError] = useState<string>('');
     const [category, setChosenCategory] = useState<LunchMoneyCategory | null>(
         null
     );
     const [settings, showSettings] = useState<boolean>(false);
     const [negative, setNegative] = useState<boolean>(true);
+    const [note, setNote] = useState<string>();
 
     const [noCategoryWarning, setNoCategoryWarning] = useState<boolean>(false);
     const amountRef = createRef<HTMLInputElement>();
@@ -371,8 +390,9 @@ const Home: React.FC = () => {
                             amount: negative ? `-${amount}` : amount,
                             category_id: category.id,
                             date: now.format('YYYY-MM-DD').toString(),
-                            payee: 'CASH',
+                            payee: 'Bill',
                             currency: chosenCurrency,
+                            notes: note,
                         },
                     ],
                 }),
@@ -469,11 +489,11 @@ const Home: React.FC = () => {
                             <NumberInput
                                 id='lineItem'
                                 ref={amountRef}
-                                value={amount.toString()}
+                                value={amount}
                                 onChange={(
                                     e: React.FormEvent<HTMLInputElement>
                                 ) =>
-                                    setAmount(parseFloat(e.currentTarget.value))
+                                    setAmount(Number(e.currentTarget.value || 0))
                                 }
                             />
                         </InputWrapper>
@@ -499,29 +519,6 @@ const Home: React.FC = () => {
                                     })}
                                 </CategoryHolder>
                             </FavoriteCategoriesHolder>
-                        )}
-                        {success && (
-                            <SuccessHolder>
-                                <p>
-                                    Want to add that category to favorites?
-                                    (Everything else will be collapsed by
-                                    default afterward, but you can always unfurl
-                                    it.)
-                                </p>
-                                <TinyButton
-                                    onClick={() => {
-                                        dispatch({
-                                            value: category,
-                                        });
-                                        setSuccess(false);
-                                    }}
-                                >
-                                    Yep!
-                                </TinyButton>
-                                <TinyButton onClick={() => setSuccess(false)}>
-                                    Nope!!
-                                </TinyButton>
-                            </SuccessHolder>
                         )}
                         <CategoryHeaderGroup>
                             <h3>Category</h3>
@@ -582,9 +579,19 @@ const Home: React.FC = () => {
                                 ))}
                             </CategoryHolder>
                         )}
+                        <TextInput
+                            type="text" placeholder="note"
+                            value={note}
+                            onChange={(e: React.FormEvent<HTMLInputElement>) => setNote(e.currentTarget.value)}
+                        />
                         <Button onClick={() => insertTransaction()}>
                             Add Transaction
                         </Button>
+                        {success && (
+                            <SuccessHolder>
+                                <p>Transaction added, quack quack</p>
+                            </SuccessHolder>
+                        )}
                     </div>
                 )}
             </MainContainer>
