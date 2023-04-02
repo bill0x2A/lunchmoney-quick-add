@@ -416,6 +416,8 @@ const Home: React.FC = () => {
         <AppContainer>
             <Head>
                 <title>Ducky Dollars</title>
+                <link rel="apple-touch-icon" href="/duck.png"></link>
+                <link rel="shortcut icon" type="image/png" href="/duck.png"/>
             </Head>
             <MainContainer>
                 <HeaderContainer>
