@@ -294,6 +294,14 @@ const Home: React.FC = () => {
     const favoriteCategories = { categories: [] };
 
     const [favCats, dispatch] = useReducer(reducer, favoriteCategories);
+    
+    let successResetTimeout: NodeJS.Timeout;
+    useEffect(() => {
+        if (success) {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            successResetTimeout = setTimeout(() => setSuccess(false), 5_000);
+        }
+    }, [success]);
 
     const downloadCats = async (at: string) => {
         console.log('are we doing this?');
