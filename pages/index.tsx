@@ -277,7 +277,7 @@ const Home: React.FC = () => {
     const [accessTokenInState, setAccessToken] = useState<string>('');
     const [success, setSuccess] = useState<boolean>(false);
     const [cats, setCats] = useState<Array<LunchMoneyCategory> | null>(null);
-    const [currencies, setCurrencies] = useState<string[]>(['thb', 'gbp', 'usd', 'vnd']);
+    const [currencies, setCurrencies] = useState<string[]>(['thb', 'gbp', 'usd', 'vnd', 'idr']);
     const [chosenCurrency, setChosenCurrency] = useState<string>('vnd');
     const [error, setError] = useState<string>('');
     const [category, setChosenCategory] = useState<LunchMoneyCategory | null>(
